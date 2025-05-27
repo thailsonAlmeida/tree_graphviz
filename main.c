@@ -108,21 +108,21 @@ int main(int argc, char *argv[]) {
 					subArvore(raiz, raiz, number);
 				}
 				system("cls");
-				printf(" *************************** \n Numero inserido com sucesso \n ***************************\n");
+				printf(" *************************** \n Numero Inserido Com Sucesso \n ***************************\n");
 				break;
 			case 2:
 				system("cls");
-				printf(" *************************** \n Exibindo arvore \n ***************************\n");
+				printf(" *************************** \n Exibindo Arvore \n ***************************\n");
 				print_arvore(raiz, 0);
 				break;
 			case 3:
 				system("cls");
-			    printf(" *************************** \n Exportando arvore para 'arvore.dot' \n ***************************\n");
+			    printf(" *************************** \n Exportando Arvore Para 'arvore.dot' \n ***************************\n");
 			    exportTreeDot(raiz, "myTree.dot");
 			    break;
 			default:
 				system("cls");
-				printf(" *************************** \n Escolha uma Opcao Invalida \n ***************************\n");				
+				printf(" *************************** \n Escolha uma Opcao Valida \n ***************************\n");				
 		}		
 		
 	} while(option != 0);
