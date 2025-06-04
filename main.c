@@ -2,11 +2,14 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define max(a,b)({typeof (a) a = (a); typeof (b) b = b; a > b? a : b;})
+
 
 typedef struct stNo {
 	int number;
 	struct stNo *esquerda;
 	struct stNo *direita;
+	int fb;
 }tNo;
 
 tNo* cria_no(tNo *raiz, tNo *no, int number){
@@ -37,6 +40,52 @@ tNo* subArvore(tNo *raiz, tNo *no, int number){
 		return subArvore(no, no->esquerda, number);
 	else
 		return subArvore(no, no->direita, number);
+}
+
+tNo* rotacaoDireita(tNo *p){
+    tNo *q = p->esquerda;
+    p->esquerda = q->direita;
+    
+    q-> direita = p;
+    return q;
+}
+
+tNo * rotacaoEsquerda(tNo *p){
+    tNo *q = p->direita;
+    p->direita = q->esquerda;
+    
+    q->esquerda = p;
+    return q;
+}
+
+tNo * balancear (tNo *p){
+    if(p->fb <= -2){
+        if(p->esquerda->fb > 0)
+            p->esquerda=rotacaoEsquerda(p->esquerda);
+        p=rotacaoDireita(p);
+    }
+    else{
+        if(p->direita->fb < 0)
+            p->direita=rotacaoDireita(p->direita);
+        p=rotacaoEsquerda(p);
+    }
+    return p;
+}
+
+int atualizaFatBal (tNo **no){
+    int he, hd;
+    if(*no == NULL)
+        return 0;
+    he=atualizaFatBal(&(*no)->esquerda);
+    hd=atualizaFatBal(&(*no)->direita);
+    (*no)->fb=hd-he;
+    if(abs((*no)->fb) >= 2){
+        *no=balancear(*no);
+        he=atualizaFatBal(&(*no)->esquerda);
+        hd=atualizaFatBal(&(*no)->direita);
+        (*no)->fb=hd-he;
+    }
+    return max(hd,he)+1;
 }
 
 void post_dot(FILE *treeGraph, tNo *no){
@@ -70,6 +119,18 @@ void exportTreeDot(tNo *raizTree, const char *my_tree_graph){
     printf("Árvore exportada com sucesso para '%s'.\n", my_tree_graph);
 }
 
+void exportDotPdf(char *my_tree_graph){
+	char comando[200];
+    sprintf(comando, "dot -Tpdf %s -o pdf_my_tree_graph.pdf", my_tree_graph);    
+	system(comando);
+}
+
+void exportDotPng(char *my_tree_graph){
+	char comando[200];
+    sprintf(comando, "dot -Tpng %s -o png_my_tree_graph.png", my_tree_graph);    
+	system(comando);
+}
+
 void print_arvore(tNo *no, int espaco){
 	int i;
 	if(!no)
@@ -92,7 +153,9 @@ int main(int argc, char *argv[]) {
 		printf("\n");	
 		printf("[1] Inserir \n");
 		printf("[2] Exibir Arvore \n");
-		printf("[3] Exportar Arvore \n");
+		printf("[3] Exportar Arvore para .dot \n");
+		printf("[4] Exportar Arvore para .pdf \n");
+		printf("[5] Exportar Arvore para .png \n");
 		printf("[0] Sair \n");
 		printf("Opção: ");
 		scanf("%d", &option);
@@ -106,6 +169,7 @@ int main(int argc, char *argv[]) {
 					raiz = subArvore(raiz, raiz, number);
 				else
 					subArvore(raiz, raiz, number);
+					atualizaFatBal(&raiz);
 				}
 				system("cls");
 				printf(" *************************** \n Numero Inserido Com Sucesso \n ***************************\n");
@@ -117,8 +181,20 @@ int main(int argc, char *argv[]) {
 				break;
 			case 3:
 				system("cls");
-			    printf(" *************************** \n Exportando Arvore Para 'arvore.dot' \n ***************************\n");
+			    printf(" *************************** \n Exportando Arvore Para .dot \n ***************************\n");
 			    exportTreeDot(raiz, "myTree.dot");
+			    break;
+			case 4:
+				system("cls");
+			    printf(" *************************** \n Exportando Arvore Para .pdf \n ***************************\n");
+			    exportTreeDot(raiz, "myTree.dot");
+			    exportDotPdf("myTree.dot");
+			    break;
+			case 5:
+				system("cls");
+			    printf(" *************************** \n Exportando Arvore Para .png \n ***************************\n");
+			    exportTreeDot(raiz, "myTree.dot");
+			    exportDotPng("myTree.dot");
 			    break;
 			default:
 				system("cls");
